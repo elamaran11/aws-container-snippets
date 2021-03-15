@@ -1,0 +1,26 @@
+description: '*Script to Automate KubernetesCleanup*  '
+schemaVersion: '0.3'
+assumeRole: '{{AutomationAssumeRole}}'
+parameters:
+  InstanceId:
+    description: ID of the Instance.
+    type: String
+  AutomationAssumeRole:
+    default: ''
+    description: (Optional) The ARN of the role that allows Automation to perform the actions on your behalf.
+    type: String
+mainSteps:
+  - name: CronCleanup
+    action: 'aws:runCommand'
+    maxAttempts: 3
+    timeoutSeconds: 300
+    inputs:
+      DocumentName: AWS-RunShellScript
+      InstanceIds:
+        - '{{InstanceId}}'
+      CloudWatchOutputConfig:
+        CloudWatchOutputEnabled: 'true'
+      Parameters:
+        commands:
+          - |
+            kubectl get jobs -n ta-ta -o go-template --template '{{range .items}}{{.metadata.name}} {{.metadata.creationTimestamp}}{{"\n"}}{{end}}' | awk '$2 <= "'$(date -d'now-6 hours' -Ins --utc | sed 's/+0000/Z/')'" { print $1 }' | xargs --no-run-if-empty kubectl delete job -n ta-ta

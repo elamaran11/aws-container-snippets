@@ -1,0 +1,41 @@
+  apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: states-cluster
+  region: us-west-2
+  version: "1.18"
+
+vpc:
+  id: vpc-0af0ce0ebbebc8ecd
+  cidr: "192.168.0.0/16"     # (optional, must match CIDR used by the given VPC)
+  securityGroup: sg-0f45052400f5a4e61
+  subnets:
+    # must provide 'private' and/or 'public' subnets by availibility zone as shown
+    private:
+      us-west-2b:
+        id: subnet-0b6487d0d8714ed46
+      us-west-2c:
+        id: subnet-0b6487d0d8714ed46
+      us-west-2d:
+        id: subnet-0b6487d0d8714ed46
+  clusterEndpoints:
+    privateAccess: true
+    publicAccess: true
+privateCluster:
+  enabled: false
+
+iam:
+  serviceRoleARN: arn:aws:iam::940019131157:role/eksctl-eksfargate-eksctl-cluster-ServiceRole-18O6W0AI8VU2S
+  fargatePodExecutionRoleARN: arn:aws:iam::940019131157:role/eksctl-eksfargate-eksctl-c-FargatePodExecutionRole-10QW3F4ILAMVG
+  withOIDC: true
+
+secretsEncryption:
+    keyARN: arn:aws:kms:us-west-2:940019131157:key/be3ad144-51a2-491f-8fdc-85eee3654936
+
+cloudWatch:
+  clusterLogging:
+    # enable specific types of cluster control plane logs
+    enableTypes: ["api","audit", "authenticator", "controllerManager", "scheduler"]
+    # all supported types: "api", "audit", "authenticator", "controllerManager", "scheduler"
+    # supported special values: "*" and "all"

@@ -1,0 +1,25 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: states-cluster
+  region: us-east-1
+
+fargateProfiles:
+  - name: fp-states
+    selectors:
+       # All workloads in the Kubernetes namespace will be scheduled onto Fargate
+      - namespace: ta-ta
+      - namespace: aq-aq
+      - namespace: us-ca
+      - namespace: us-ct
+      - namespace: us-wa
+  - name: coredns
+    selectors:
+      # All workloads in the "kube-system" K8 namespace will be s
+      # scheduled onto Fargate, this required for CoreDNS too
+      - namespace: kube-system
+
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]
