@@ -97,3 +97,29 @@ class SampleTwoServiceStack(core.Stack):
         backend_service.service.connections.allow_from(
             frontend_service.service, ec2.Port.tcp(6379)
         )
+
+        
+        frontend1_service = ecs_patterns.ApplicationLoadBalancedFargateService(
+           self, 
+           id="FrontendFargateLBService",
+           cluster=cluster,
+           desired_count=2,
+           service_name="Fargate-Frontend",
+           cloud_map_options=ecs.CloudMapOptions(name="frontend1"),
+           cpu=256,
+           memory_limit_mib=512,
+           public_load_balancer=True,
+           task_image_options={
+               "image":  ecs.ContainerImage.from_registry("brentley/ecsdemo-frontend"),
+               "container_port": 3000,
+               "enable_logging": True,
+               "environment":  {
+               "CRYSTAL_URL": "http://ecsdemo-crystal.service:3000/crystal",
+               "NODEJS_URL": "http://ecsdemo-nodejs.service:3000"
+               }
+           },
+         )
+         
+        frontend1_service.service.connections.allow_from_any_ipv4(
+            ec2.Port.tcp(3000), "flask inbound"
+        )
