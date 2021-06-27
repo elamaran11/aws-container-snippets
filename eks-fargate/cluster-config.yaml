@@ -1,8 +1,8 @@
-  apiVersion: eksctl.io/v1alpha5
+apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: states-cluster
+  name: name-cluster
   region: us-west-2
   version: "1.18"
 
